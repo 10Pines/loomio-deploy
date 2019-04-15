@@ -40,7 +40,6 @@ app:
     - REDIS_URL=redis://redis:6379
     - VIRTUAL_HOST=loomio.10pines.com
   volumes:
-    - ./client:/loomio/public/client
     - ./uploads:/loomio/public/system
     - ./files:/loomio/public/files
     - ./plugins:/loomio/plugins/docker
