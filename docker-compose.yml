@@ -18,6 +18,7 @@ nginx:
     - ./nginx/vhost.d:/etc/nginx/vhost.d
     - ./nginx/conf.d/custom.conf:/etc/nginx/conf.d/custom.conf:ro
     - ./nginx/html:/usr/share/nginx/html
+    - ./nginx/dhparam:/etc/nginx/dhparam:rw
   ports:
     - 80:80
     - 443:443
@@ -37,6 +38,7 @@ app:
   environment:
     - DATABASE_URL=postgresql://postgres:password@db/loomio_production
     - REDIS_URL=redis://redis:6379
+    - VIRTUAL_HOST=loomio.10pines.com
   volumes:
     - ./client:/loomio/public/client
     - ./uploads:/loomio/public/system
