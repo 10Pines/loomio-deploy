@@ -1,37 +1,12 @@
-letsencrypt:
-  container_name: loomio-letsencrypt
-  restart: always
-  image: jrcs/letsencrypt-nginx-proxy-companion
-  volumes:
-    - /var/run/docker.sock:/var/run/docker.sock:ro
-    - ./certificates:/etc/nginx/certs:rw
-  volumes_from:
-    - nginx
-
-nginx:
-  container_name: loomio-nginx
-  restart: always
-  image: jwilder/nginx-proxy
-  volumes:
-    - /var/run/docker.sock:/tmp/docker.sock:ro
-    - ./certificates:/etc/nginx/certs:ro
-    - ./nginx/vhost.d:/etc/nginx/vhost.d
-    - ./nginx/conf.d/custom.conf:/etc/nginx/conf.d/custom.conf:ro
-    - ./nginx/html:/usr/share/nginx/html
-    - ./nginx/dhparam:/etc/nginx/dhparam:rw
-  ports:
-    - 80:80
-    - 443:443
-  links:
-    - app
-
 app:
   container_name: loomio-app
   restart: always
-  image: ${LOOMIO_CONTAINER_IMAGE}:${LOOMIO_CONTAINER_TAG}
+  image: ${LOOMIO_CONTAINER_IMAGE}
   expose:
     - 3000
   env_file: ./env
+  ports:
+    - 127.0.0.1:3000:3000
   links:
     - db
     - redis
@@ -48,7 +23,7 @@ app:
 worker:
   container_name: loomio-worker
   restart: always
-  image: ${LOOMIO_CONTAINER_IMAGE}:${LOOMIO_CONTAINER_TAG}
+  image: ${LOOMIO_CONTAINER_IMAGE}
   env_file: ./env
   links:
     - db
