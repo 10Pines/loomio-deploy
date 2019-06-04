@@ -55,7 +55,7 @@ redis:
 mailin:
   container_name: loomio-mailin
   restart: always
-  image: ${MAILIN_CONTAINER_IMAGE}:${MAILIN_CONTAINER_TAG}
+  image: ${MAILIN_CONTAINER_IMAGE}
   ports:
     - "25:25"
   links:
