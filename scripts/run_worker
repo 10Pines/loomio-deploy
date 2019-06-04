@@ -1,0 +1,3 @@
+#!/bin/bash
+
+/usr/bin/docker exec loomio-worker bundle exec rake loomio:hourly_tasks >> /home/tenpines/servicios/logs/loomio.worker.$(date +%y-%m-%d).log 2>&1
