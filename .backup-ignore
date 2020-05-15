@@ -3,3 +3,4 @@ backups*
 .git*
 client*
 nginx*
+certs*

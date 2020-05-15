@@ -1,0 +1,6 @@
+loomio.10pines.com
+
+tls infraestructura@10pines.com { }
+
+reverse_proxy 127.0.0.1:3000
+

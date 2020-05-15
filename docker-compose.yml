@@ -1,64 +1,74 @@
-app:
-  container_name: loomio-app
-  restart: always
-  image: ${LOOMIO_CONTAINER_IMAGE}
-  expose:
-    - 3000
-  env_file: ./env
-  ports:
-    - 127.0.0.1:3000:3000
-  links:
-    - db
-    - redis
-  environment:
-    - DATABASE_URL=postgresql://postgres:password@db/loomio_production
-    - REDIS_URL=redis://redis:6379
-    - VIRTUAL_HOST=loomio.10pines.com
-  volumes:
-    - ./uploads:/loomio/public/system
-    - ./files:/loomio/public/files
-    - ./plugins:/loomio/plugins/docker
-    - ./import:/import
-
-worker:
-  container_name: loomio-worker
-  restart: always
-  image: ${LOOMIO_CONTAINER_IMAGE}
-  env_file: ./env
-  links:
-    - db
-  environment:
-    - DATABASE_URL=postgresql://postgres:password@db/loomio_production
-    - TASK=worker
-  volumes:
-    - ./client:/loomio/public/client
-    - ./uploads:/loomio/public/system
-    - ./files:/loomio/public/files
-    - ./plugins:/loomio/plugins/docker
-
-db:
-  container_name: loomio-db
-  restart: always
-  image: postgres:${POSTGRES_CONTAINER_TAG}
-  volumes:
-    - ./pgdata:/pgdata
-    - ./pgdumps:/pgdumps
-  environment:
-   - POSTGRES_PASSWORD=password
-   - PGDATA=/pgdata
-
-redis:
-  container_name: loomio-redis
-  restart: always
-  image: redis:5.0
-
-mailin:
-  container_name: loomio-mailin
-  restart: always
-  image: ${MAILIN_CONTAINER_IMAGE}
-  ports:
-    - "25:25"
-  links:
-    - app
-  environment:
-    - WEBHOOK_URL=http://app:3000/email_processor/
+version: '3'
+services:
+  loadbalancer:
+    container_name: caddy
+    image: caddy
+    network_mode: host
+    volumes:
+      - ./caddy:/etc/caddy
+      - ./certs:/data/caddy # to save certificates on disk
+  
+  app:
+    container_name: loomio-app
+    restart: always
+    image: ${LOOMIO_CONTAINER_IMAGE}
+    expose:
+      - 3000
+    env_file: ./env
+    ports:
+      - 127.0.0.1:3000:3000
+    links:
+      - db
+      - redis
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db/loomio_production
+      - REDIS_URL=redis://redis:6379
+      - VIRTUAL_HOST=loomio.10pines.com
+    volumes:
+      - ./uploads:/loomio/public/system
+      - ./files:/loomio/public/files
+      - ./plugins:/loomio/plugins/docker
+      - ./import:/import
+  
+  worker:
+    container_name: loomio-worker
+    restart: always
+    image: ${LOOMIO_CONTAINER_IMAGE}
+    env_file: ./env
+    links:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db/loomio_production
+      - TASK=worker
+    volumes:
+      - ./client:/loomio/public/client
+      - ./uploads:/loomio/public/system
+      - ./files:/loomio/public/files
+      - ./plugins:/loomio/plugins/docker
+  
+  db:
+    container_name: loomio-db
+    restart: always
+    image: postgres:${POSTGRES_CONTAINER_TAG}
+    volumes:
+      - ./pgdata:/pgdata
+      - ./pgdumps:/pgdumps
+    environment:
+     - POSTGRES_PASSWORD=password
+     - PGDATA=/pgdata
+  
+  redis:
+    container_name: loomio-redis
+    restart: always
+    image: redis:5.0
+  
+  mailin:
+    container_name: loomio-mailin
+    restart: always
+    image: ${MAILIN_CONTAINER_IMAGE}
+    ports:
+      - "25:25"
+    links:
+      - app
+    environment:
+      - WEBHOOK_URL=http://app:3000/email_processor/
